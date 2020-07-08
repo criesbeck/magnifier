@@ -1,0 +1,256 @@
+// Original source: http://webdeveloper.earthweb.com/repository/javascripts/2005/03/660841/vergrootglas.html
+// 
+// Changes and improvements:
+// - supports images anywhere on page, not just at top
+// - calculates magnification from the image width's
+// - supports non-square individually-sized magnifiers
+// - uses standardized methods for event capture if available (captureEvents
+//   disappearing in Firefox 3)
+// - replaces clip rect with clipping div's because clip computed style not well
+//   supported in Safari 3 or IE 7 (thanks, dhtml)
+// - more modular code, no public names
+
+// start of private function to avoid name pollution
+// - http://www.davidflanagan.com/blog/2005_07.html
+(function () {
+
+// imagePairData: a list of data about all small / large image pairs.
+// Calculated at load time, each element data contains:
+//
+//  data.small - the small image
+//  data.large - the large magnified image
+//  data.smallx, data.smally - the x, y page position for the small image
+//  data.magx, data.magy - the x and y magnification factors
+//  data.lensw, data.lensh - the width and height of the magnifier lens
+ 
+var imagePairData = [];
+
+// currentImagePair: the imagePairData for the item currently being magnified, if any
+var currentImagePair;
+
+
+// Simon Willison's addLoadEvent -- http://simonwillison.net/2004/May/26/addLoadEvent/
+function addLoadEvent(func) {
+  var oldonload = window.onload;
+  if (typeof oldonload != 'function') {
+    window.onload = func;
+  } 
+  else {
+    window.onload = function() {
+      oldonload();
+      func();
+    };
+  }
+}
+
+function mouseTrack(evt) {
+  var x, y;
+  if (evt && !(evt.pageX === undefined)) {
+     x = evt.pageX;
+     y = evt.pageY;
+     evt.stopPropagation();
+  }
+  else { // Internet Explorer
+     x = event.clientX + (document.body.scrollLeft || document.documentElement.scrollLeft) - document.body.clientLeft;
+     y = event.clientY + (document.body.scrollTop || document.documentElement.scrollTop) - document.body.clientTop;
+     event.cancelBubble = true;
+  }
+  
+  var data = getImagePairData(x, y);
+  
+  if (data) {
+    updateMagnifiedImage(x, y, data);
+  }
+  else if (currentImagePair) {
+    hideMagnifiedImage(currentImagePair.large);
+    currentImagePair = null;
+  }
+}
+
+// center the magnifier lens on x, y
+function centerLens(data, x, y) {
+  var lens = data.large.parentNode;
+  lens.style.left = (x - (data.lensw / 2)) + "px";
+  lens.style.top = (y - (data.lensh / 2)) + "px";
+}
+
+function findImagePairData(x, y) {
+  for (var i = 0; i < imagePairData.length; ++i) {
+    var data = imagePairData[i];
+    if (insideBox(x, y, data.smallx, data.smally, data.small.width, data.small.height)) {
+      return data;
+    }
+  }
+  return null;
+}
+
+function getComputedValue(elt, property) {
+  var val = "0";
+  if (elt.currentStyle) {
+    val = elt.currentStyle[property];
+  }
+  else if (document.defaultView && document.defaultView.getComputedStyle) {
+    val = document.defaultView.getComputedStyle(elt, null)[property];
+  }
+  return parseFloat(val);
+}
+
+function getImagePairData(x, y) {
+  // reuse current data if possible
+  if (insideImagePair(x,y, currentImagePair)) {
+    return currentImagePair;
+  }
+  // don't search for another if only one pair
+  else if (imagePairData.length < 2) {
+    return null;
+  }
+  else {
+    return findImagePairData(x, y);
+  }
+}
+
+function getLargeImages() {
+  var largeImages = [];
+  for (var i = 0; i < document.images.length; ++i) {
+    var image = document.images[i];
+    if (image.className == "maglarge") {
+      largeImages[largeImages.length] = image;
+    }
+  }
+  return largeImages;
+}
+
+function getMagnifierParent(node) {
+  while (node && node.className != "magnifier") {
+    node = node.parentNode;
+  }
+  return node;
+}
+
+function getOffset(obj, field) {
+  var sum = 0;
+  do { sum += obj[field];  }
+  while (obj = obj.offsetParent);
+  return sum;
+}
+
+function getSmallImage(largeImage) {
+  var parent = getMagnifierParent(largeImage);
+  var images = parent.getElementsByTagName("IMG");
+  for (var i = 0; i < images.length; ++i) {
+    if (images[i].className == "magsmall") {
+      return images[i];
+    }
+  }
+  return null;
+}
+
+function hideMagnifiedImage(image) {
+  image.style.display = "none";
+}
+
+function insideImagePair(x, y, data) {
+  return data && insideBox(x, y, data.smallx, data.smally, data.small.width, data.small.height);
+}
+
+function insideBox(x, y, sx, sy, w, h) {
+  return (sx <= x && x <= sx + w && sy <= y && y <= sy + h);
+}
+
+// Pair the large image with the magsmall image in the same container. If
+// there is no magsmall image, create one.
+// In either case, an object is created holding the images, the position of
+// the small image, the magnification factors, and the magnifier dimensions.
+function makeImagePairData(largeImage) {
+  var lens = largeImage.parentNode;
+  var smallImage = getSmallImage(largeImage) || makeSmallImage(largeImage);
+  var sx = getOffset(smallImage, "offsetLeft");
+  var sy = getOffset(smallImage, "offsetTop");
+  var sw = getComputedValue(smallImage, "width");
+  var sh = getComputedValue(smallImage, "height");
+  var lw = getComputedValue(largeImage, "width");
+  var lh = getComputedValue(largeImage, "height");
+  
+  return {
+    small: smallImage, large: largeImage, 
+    smallx: sx, smally: sy,
+    magx: lw / sw, magy: lh / sh,
+    lensw: getComputedValue(lens, "width"), 
+    lensh: getComputedValue(lens, "height")
+  };
+}
+
+function makeSmallImage(largeImage) {
+  var parent = getMagnifierParent(largeImage);
+  smallImage = largeImage.cloneNode(false);
+  smallImage.className = "magsmall";
+  smallImage.style.width = parent.style.width;
+  smallImage.style.height = parent.style.height;
+  parent.insertBefore(smallImage, largeImage.parentNode);
+  return smallImage;
+}
+
+function updateMagnifiedImage(x, y, data) {
+  // upper left of small image
+  var sx = data.smallx;
+  var sy = data.smally;
+  // mouse x,y relative to small image
+  var rx = x - sx;
+  var ry = y - sy;
+  // position lens
+  centerLens(data, rx, ry);
+  // mouse x, y relative to large image
+  var Rx = Math.floor(rx * data.magx);
+  var Ry = Math.floor(ry * data.magy);
+  // upper left of large image relative to lens
+  var lens = data.large.parentNode;
+  var Sx = x - Rx - getOffset(lens, "offsetLeft");
+  var Sy = y - Ry - getOffset(lens, "offsetTop");
+  // position image
+  var largeStyle = data.large.style;    
+  largeStyle.left = Sx + "px";
+  largeStyle.top = Sy + "px";
+  window.status = "x " + x + " y " + y + " sx " + sx + " sy " + sy  + " Rx " + Rx + " Ry " + Ry  + " rx " + rx + " ry " + ry + " Sx " + Sx + " Sy " + Sy;
+  
+  largeStyle.display = "block";
+  currentImagePair = data;
+}
+
+// Set up mousetracking
+function initListeners() {
+  if (document.addEventListener) {
+    document.addEventListener('mousemove', mouseTrack, true);
+  }
+  else if (document.attachEvent) {
+    document.attachEvent('onmousemove', mouseTrack);
+  }
+  else {
+    if (!document.all) {
+      document.captureEvents(Event.MOUSEMOVE);
+    }
+    document.onmousemove = mouseTrack;
+  }
+}
+
+// Create magnifier data for every image with class "maglarge."
+function registerImagePairs() {
+  // Careful! makeImagePairData() inserts small images before the large
+  // images so collect large images first to avoid endless insertion.
+  var largeImages = getLargeImages();
+  imagePairData = [];
+  
+  for (var i = 0; i < largeImages.length; ++i) {
+    imagePairData[imagePairData.length] = makeImagePairData(largeImages[i]);
+    hideMagnifiedImage(largeImages[i]);
+  }
+  
+}
+
+// startup code adds onload events to find the images and start mouse tracking
+addLoadEvent(function () {
+  registerImagePairs();
+  initListeners();
+});
+
+// End private function, call startup code
+})();

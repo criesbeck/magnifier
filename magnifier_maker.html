@@ -1,0 +1,218 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Magnifier Maker</title>
+
+<script type="text/javascript" src="magnifier.js"></script>
+
+<script type="text/javascript">
+function makeHTML(form) {
+  var sw = getPositiveNumber("smallWidth");
+  var sh = getPositiveNumber("smallHeight");
+  var lensw = getPositiveNumber( "lensWidth");
+  var lensh = getPositiveNumber("lensHeight");
+  var largeSource = getNonEmptyText("largeSource");
+  var n = getPositiveNumber("imageIndex");
+  if (sw && sh && lensw && lensh && largeSource) {
+    var size = 'width:' + sw + 'px;height:' + sh + 'px';
+    var largeId = 'large' + n;
+    var smallSource = form.smallSource.value;
+    var mapName = form.mapName.value;
+    var mapInfo = mapName ? ' ismap="ismap" usemap="#' + mapName + '" ' : "";
+    var filePrefix = form.needsFileId.checked ? "?file_id=" : "";
+    var jsLoad = n == 1 ? '<script type="text/javascript" src="' + filePrefix + 'magnifier.js"></'
+        + 'script>\n' : "";
+    var html = '<div style="position:relative;overflow:hidden;' + size + '">';
+    if (smallSource) {
+      html += '<img id="small' + n + '" src="' + filePrefix + smallSource + '" style="position:absolute;'
+              + size + '" />';
+    }
+    html += '<div id="lens' + n + '" style="position:absolute;overflow:hidden;width:' +
+            lensw + 'px;height:' + lensh + 'px"><img id="' + largeId + '" src="'
+            + filePrefix + largeSource + '" style="position:absolute;"' + mapInfo + ' /></div></div>';
+    
+    form.imageHTML.value = jsLoad + html;
+    
+    // load test image then make magnifier
+    var testArea = getElt("testArea");
+    testArea.innerHTML = html;
+    var imgElt = document.getElementById(largeId);
+    imgElt.onload = function() { MAGNIFIER.reset(); };
+  }
+}
+
+function getElt(id) {
+  var elt = document.getElementById(id);
+  if (!elt) {
+    alert("Internal error: no form element with id " + id);
+    return null;
+  }
+  return elt
+}
+
+function getLabel(elt) {
+  return elt.parentNode.firstChild.data;
+}
+
+function getNonEmptyText(id) {
+  var elt = getElt(id);
+  if (!elt) {
+    return "";
+  }
+  else if (!elt.value) {
+    alert(getLabel(elt) + " must contain an image file name");
+    return "";
+  }
+  else {
+    return elt.value;
+  }
+}
+
+function getPositiveNumber(id) {
+  var elt = getElt(id);
+  if (!elt) {
+    return 0;
+  }
+  else {
+    var n = getEltNumber(elt);
+    if (n > 0) {
+      return n;
+    }
+    else {
+      alert(getLabel(elt) + " must contain a positive number");
+      return 0;
+    }
+  }
+}
+
+function getNumber(id) {
+  return getEltNumber(getElt(id));
+}
+
+function getEltNumber(elt) {
+  return elt ? + elt.value : 0;
+}
+  
+</script>
+
+
+</head>
+<body>
+
+<h1>Magnifier Maker</h1>
+
+
+
+<p>This page is a tool for creating the HTML code needed for 
+images with magnifying lenses.</p>
+
+<p>For each image that you want to 
+create a magnifier for, enter the information requested in the form below, then click
+<b>Make HTML</b>. Copy the HTML in the field labelled <b>Image HTML</b> 
+to your HTML page.</p>
+
+<p>The magnifier uses Javascript. To load the Javascript code needed, 
+copy the text in the field labelled
+<b>Javascript HTML</b> to the top of your HTML page. This only needs
+to be done once, before the first image.</p>
+
+
+<hr />
+
+<form action="" onsubmit="return false">
+<table summary="form" border="0">
+<tr>
+<th style="text-align: left">
+<label>Image source file: 
+<input type="text" size="30" id="largeSource" />
+</label>
+</th>
+<td>E.g., <tt>flow-diagram.gif</tt>
+</tr>
+
+<tr>
+<th style="text-align: left">
+<label>Add ?file_id=: 
+<input type="checkbox" id="needsFileId" checked="checked" />
+</label>
+</th>
+<td>Check this for HTML for the remote web site. Uncheck for local image testing.
+</tr>
+<br />
+<tr>
+<th style="text-align: left">
+<label>Visible Image Width: <input type="text" size="5" id="smallWidth" /></label>
+<label>Height: <input type="text" size="5" id="smallHeight" /></label>
+</th>
+<td>Give the width and height of the image as it should appear on the page,
+in pixels.</td> 
+</tr>
+
+<tr>
+<th style="text-align: left">
+<label>Lens Width: <input type="text" size="5" id="lensWidth" value="100" /></label>
+<label>Height: <input type="text" size="5" id="lensHeight" value="100" /></label>
+</th>
+<td>Give the width and height of the "magnifying lens" in pixels.</td>
+</tr>
+
+<tr>
+<th style="text-align: left">
+<label>Image Index: 
+<input type="text" size="3" id="imageIndex" value="1" />
+</label>
+</th>
+<td>Use <tt>1</tt> for the first magnified
+image on a page, <tt>2</tt> for the second on the same page, and so on.</td> 
+</tr>
+
+<tr>
+<th style="text-align: left">
+<label>Small Image Source File: 
+<input type="text" size="30" id="smallSource" />
+</label>
+</th>
+<td><em>Optional:</em> If not given, the large image will be reduced automatically.</td>
+</tr>
+
+<tr>
+<th style="text-align: left">
+<label>Use Map: 
+<input type="text" size="20" id="mapName" />
+</label>
+</th>
+<td><em>Optional:</em> If this is an HTML image map, enter the name of the map, e.g., 
+<tt>orgchart</tt>.</td>
+</tr>
+</table>
+
+<p><input type="button" value="Make HTML" onclick="makeHTML(this.form)">
+<em>If an image doesn't appear below, check the image file name.</em></p>
+
+<table summary="output" border="1">
+<tr>
+<td style="vertical-align:top; padding:10px"><h3>Image HTML</h3>
+<p>
+Copy and paste this text into the HTML where you want the image to appear.
+</p>
+<textarea name="imageHTML" rows="10" cols="50"></textarea>
+</td>
+<td style="vertical-align:top; padding:10px">
+<h3>Test Image</h3>
+
+<p>Roll the mouse over the image to see what the magnifier will look like.</p>
+
+<div id="testArea">
+</div>
+</td>
+</tr>
+</table>
+
+</form>
+
+       
+</body>
+</html>
+
+
