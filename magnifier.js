@@ -73,14 +73,9 @@ function centerRect(rect, x, y) {
 }
 
 
-function findImagePairData(x, y) {
-  for (var i = 0; i < imagePairData.length; ++i) {
-    if (imagePairData[i].contains(x, y)) {
-      return imagePairData[i];
-    }
-  }
-  return null;
-}
+const findImagePairData = mousedImage => (
+  imagePairData.find(pair => imagePairContains(pair, mousedImage))
+);
 
 // Don't use getCurrentStyle() -- Opera 9.5 calculates a zero-sized clipping
 // rectangle as a default. 
@@ -111,10 +106,14 @@ function getComputedValue(elt, property) {
   return parseFloat(getCurrentStyle(elt, property));
 }
 
-function getImagePairData(x, y) {
+function imagePairContains(pair, image) {
+  return pair.large.image === image || pair.small.image === image;
+}
+
+function getImagePairData(mousedImage) {
   // reuse current data if possible
   if (currentImagePair) {
-    if (currentImagePair.contains(x, y)) {
+    if (imagePairContains(currentImagePair, mousedImage)) {
       return currentImagePair;
     }
     // don't search for another if only one pair
@@ -123,7 +122,7 @@ function getImagePairData(x, y) {
     }
   }
   else {
-    return findImagePairData(x, y);
+    return findImagePairData(mousedImage);
   }
 }
 
@@ -327,22 +326,27 @@ function mouseTrack(evt) {
      event.cancelBubble = true;
   }
   
-  imageTrack(x, y);
+  imageTrack(x, y, evt.clientX, evt.clientY);
 }
 
 // Touch tracking
 function touchTrack(evt) {
   var touch = evt.touches[0];
-  if (imageTrack(touch.pageX, touch.pageY)) {
+  if (imageTrack(touch.pageX, touch.pageY, imageFromPoint(touch.clientX, touch.clientY))) {
     evt.preventDefault();
   }
 }
 
+function imageFromPoint(x, y) {
+  var elt = document.elementFromPoint(x, y);
+  return !elt ? null : elt.tagName === 'IMG' ? elt : elt.querySelector('IMG')
+};
+
 // Manages the magnifier display
 // returns the image being tracked or null if mouse/touch not on 
 // a magnifier image
-function imageTrack(x, y) {
-  var data = getImagePairData(x, y);
+function imageTrack(x, y, cx, cy) {
+  var data = getImagePairData(imageFromPoint(cx, cy));
   
   if (data) {
     updateMagnifiedImage(x, y, data);
@@ -405,6 +409,7 @@ function initListeners() {
   if (document.addEventListener) {
     document.addEventListener('mousemove', mouseTrack, true);
     document.addEventListener('touchmove', touchTrack, true);
+    window.addEventListener('resize', registerImagePairs)
   }
   else if (document.attachEvent) {
     document.attachEvent('onmousemove', mouseTrack);
