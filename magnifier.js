@@ -343,7 +343,7 @@ function imageFromPoint(x, y) {
 };
 
 // Manages the magnifier display
-// returns the image being tracked or null if mouse/touch not on 
+// returns the image being tracked or undefined if mouse/touch not on 
 // a magnifier image
 function imageTrack(x, y, cx, cy) {
   var data = getImagePairData(imageFromPoint(cx, cy));
@@ -425,18 +425,31 @@ function initListeners() {
   }
 }
 
+// wrap a 2X magnifier around an image marked maglarge if needed
+function addLens(img) {
+  if (img.classList.contains('maglarge') && !img.parentElement.classList.contains('maglens')) {
+    const parent = img.parentElement;
+    const size = `height:${Math.floor(img.height / 2)}px; width: ${Math.floor(img.width / 2)}px`;
+    img.outerHTML = `<div class="magnifier" style="${size}"><div class="maglens">${img.outerHTML}</div></div>`;
+    return parent.querySelector('img');
+  }
+  return img;
+  
+}
+
 // Create magnifier data for every "large" image.
 function registerImagePairs() {
-  // Careful! makeImagePairData() inserts small images before the large
-  // images so collect large images first to avoid endless insertion.
+  // Careful! be sure to get the actual large images before calling
+  // makeImagePairData() which inserts new small images.
   var largeImages = getLargeImages();
   imagePairData = [];
   
   for (var i = 0; i < largeImages.length; ++i) {
-    var data = makeImagePairData(i, largeImages[i]);
+    var image = addLens(largeImages[i])
+    var data = makeImagePairData(i, image);
     if (data) {
       imagePairData[imagePairData.length] = data;
-      hideMagnifiedImage(largeImages[i]);
+      hideMagnifiedImage(image);
     }
   }
 }
