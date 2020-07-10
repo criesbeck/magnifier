@@ -256,12 +256,17 @@ function makeImagePairData(i, largeImage) {
   }
   
   // get small image size
-  // default height to same magnification as width
+  // given one dimension, calculate the other proportionally
   var sw = getInlineValue(parent, "width");
   var sh = getInlineValue(parent, "height");
-  if (!sh) {
+  if (sw && !sh) {
     sh = Math.round(lh * (sw / lw));
     parent.style.height = sh + "px";
+  }
+
+  if (sh && !sw) {
+    sw = Math.round(lw * (sh / lh));
+    parent.style.width = sw + "px";
   }
 
   if (isNaN(sw) || isNaN(sh)) {
@@ -425,11 +430,14 @@ function initListeners() {
   }
 }
 
-// wrap a 2X magnifier around an image marked maglarge if needed
+const getPower = img => img.dataset.power || '2';
+
+// wrap a magnifier around an image marked maglarge if needed
 function addLens(img) {
   if (img.classList.contains('maglarge') && !img.parentElement.classList.contains('maglens')) {
     const parent = img.parentElement;
-    const size = `height:${Math.floor(img.height / 2)}px; width: ${Math.floor(img.width / 2)}px`;
+    const power = + getPower(img)
+    const size = `height:${Math.floor(img.height / power)}px; width: ${Math.floor(img.width / power)}px`;
     img.outerHTML = `<div class="magnifier" style="${size}"><div class="maglens">${img.outerHTML}</div></div>`;
     return parent.querySelector('img');
   }

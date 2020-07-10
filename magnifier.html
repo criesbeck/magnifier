@@ -15,282 +15,184 @@
 page</a>, but there's pretty much no original code left. Many thanks
 to Gerard Talbot and 'dhtml' on the <code>comp.lang.javascript</code> newsgroup
 for many pointers, critiques, and ideas, and to Josh Hillier who helped extend
-this to work with touch events.</p>
+this to work with touch events.
+</p>
 
-<p>Tested on
-Firefox 2 and 3, Internet Explorer 7, Opera 9.5, and Safari 3.1 for Windows and MacOS X,
-and Safari on an iPad.</p>
+<h2 id="loadmag">Getting the code</h2>
 
-<hr>
+<p>To use, include the following in the head or body of your web page:</p>
 
-<p>Roll the mouse button over the images below, or touch and move your finger over the images,
-to see the magnifiers in action.</p>
-
-<table align="center" summary="two image examples">
-
-<tr>
-<td>
-<div class="magnifier" style="width: 512px; margin: 20px;">
-  <div class="maglens">
-   <img src="vlag.jpg" class="maglarge" alt="example image" ismap="ismap" usemap="#kaart" />
-  </div>
-</div>
-</td>
-<td>
-<div class="magnifier" style="height: 249px; width: 253px; margin: 20px">
-  <div class="maglens" style="width:100px; height:75px">
-    <img src="treasure-map.jpg" class="maglarge" alt="treasure map" ismap="ismap" usemap="#pirate"
-      style="height: 374px; width: 380px;" />
-  </div>
-</div>
-</td>
-</tr>
-</table>
-
-<map id="kaart" name="kaart">
-   <area coords="331,258,439,312" href="https://www.vincentmes.dds.nl/index.html" shape="rect" alt="Vincent Mes" /> 
-   <area coords="530,258,639,312" href="https://www.vincentmes.dds.nl/indexUK.html" shape="rect" alt="Vincent Mes" /> 
-</map>
-
-<map id="pirate" name="pirate">
-   <area coords="268,45,321,104" href="https://en.wikipedia.org/wiki/Buried_treasure" shape="rect" alt="Wikipedia buried treasure entry" /> 
-   <area coords="88,122,240,233" href="https://en.wikipedia.org/wiki/Piracy" shape="rect" alt="Wikipedia pirate entry" /> 
-</map>
-
-<h2>To use this library for your own purposes</h2>
-
-<ul>
-<li>Upload <code><a href="magnifier.js">magnifier.js</a></code> and <code><a href="magnifier.css">magnifier.css</a></code> to the same
-place as your HTML file.</li>
-
-<li>Put this code in the <code>head</code> section of your HTML:
-
-<a name="loadmag"></a>
 <blockquote><pre>&lt;link type=&quot;text/css&quot; href=&quot;magnifier.css&quot; rel=&quot;stylesheet&quot;&gt;
 
 &lt;script type=&quot;text/javascript&quot; src=&quot;magnifier.js&quot;&gt;&lt;/script&gt;
 </pre></blockquote>
 
-If you don't have access to the <code>head</code> of your HTML, e.g.,
-you are working in a content management system, all is not lost. 
-Put the Javascript line in the <code>body</code> section of your HTML file, and read on.
-</li>
+<p>You can get these two files by using your browser's "save as web page complete" option to
+  save this web page. You can also get them from 
+  <a href="https://github.com/criesbeck/magnifier" target="_blank">github</a>.
+</p>
 
-<li>Put each image you want to magnify inside two <code>div</code>s, in this
-pattern, with the <code>class</code> attributes shown:
+<h2>Simple 2X Magnifier</h2>
+
+<p>Move the mouse cursor over the image below, or touch and move your finger over it.</p>
+
+<div>
+  <img src="deloitte-agile-map-large.jpg" class="maglarge" alt="deloitte agile map">
+  <p><a href="https://imgur.com/NzT6Bch" target="_blank">Image source</a></p>
+</div>
+
+<p>Here's the HTML:</p>
+
+<blockquote><pre>&lt;div>
+  <strong>&lt;img src="deloitte-agile-map-large.jpg" class="maglarge" alt="deloitte agile map" /></strong>
+  &lt;p>&lt;a href="https://imgur.com/NzT6Bch" target="_blank">Source&lt;/a>&lt;/p>
+&lt;/div></pre></blockquote>
+
+<p>
+  Any image marked with the <strong>class</strong> <code>maglarge</code> will
+  get a 2X magnifier. That means a half-size image will be displayed, and
+  the magnifying lens will show the actual full-size detail.
+</p>
+
+<h2>Custom Magnifier Power</h2>
+
+<p>
+  To get a different level of magnification, add
+  a <strong>data-power</strong> attribute to the image. For example, 
+  here's the same image, at one-third size, with a 3X lens.
+</p>
+
+<div>
+  <img src="deloitte-agile-map-large.jpg" class="maglarge" data-power="3" alt="deloitte agile map">
+  <p><a href="https://imgur.com/NzT6Bch" target="_blank">Image source</a></p>
+</div>
+
+<p>
+  The HTML is:
+</p>
+
+<blockquote><pre>&lt;div>
+  &lt;img src="deloitte-agile-map-large.jpg" class="maglarge" <strong>data-power="3"</strong> alt="deloitte agile map">
+  &lt;p>&lt;a href="https://imgur.com/NzT6Bch" target="_blank">Source&lt;/a>&lt;/p>
+&lt;/div></pre></blockquote>
+
+<h2>Styling the page image</h2>
+
+<p>
+  If you want to style the <code>DIV</code> that displays the smaller image, use this HTML 
+  pattern:
+</p>
 
 <blockquote><pre>&lt;div <b>class=&quot;magnifier&quot;</b> style=&quot;width: <em>sw</em>px; height: <em>sh</em>px;&quot;&gt;
   &lt;div <b>class=&quot;maglens&quot;</b>&gt;
-    &lt;img src=&quot;<em>image-file</em>&quot; <b>class=&quot;maglarge&quot;</b> style=&quot;width: <em>lw</em>px; height: <em>lh</em>px;&quot; /&gt;
+    &lt;img src=&quot;<em>image-file</em>&quot; <b>class=&quot;maglarge&quot;</b> style=&quot;width: <em>lw</em>px; height: <em>lh</em>px;&quot;&gt;
   &lt;/div&gt;
 &lt;/div&gt;</pre></blockquote>
 
-<em>lw</em> and <em>lh</em> are the width and height of the large (magnified) image.
-If omitted, the width and height of the source image is used.
-<br>
-
-<em>sw</em> and <em>sh</em> are the width and height of the smaller image that should
-appear on the page.If the height <em>sh</em> is omitted, it will be calculated
-to be consistent with the width <em>sw</em>. A good ratio is to set <em>sw</em>
-to half of <em>lw</em>.
-</li>
-
-<li><a name="lenssize"></a>Optionally, specify a width and height for for the magnifer lens. If none is given,
-the default size of 150 x 150 pixels is used. The second example below
-makes a lens that is 100 x 75 pixels. <a href="#magsize">The 
-default can be changed.</a>
-</li>
-</ul>
-
-<p>Here's the HTML for the two examples above:</p>
-
-<blockquote><pre>&lt;div class=&quot;magnifier&quot; style=&quot;height: 297px; width: 512px; margin: 20px;&quot;&gt;
-  &lt;div class=&quot;maglens&quot;&gt;
-   &lt;img src=&quot;vlag.jpg&quot; class=&quot;maglarge&quot; alt=&quot;example image&quot; ismap=&quot;ismap&quot; usemap=&quot;#kaart&quot;
-        style=&quot;height: 560px; width: 964px;&quot; /&gt;
-  &lt;/div&gt;
-&lt;/div&gt;
-
-&lt;div class=&quot;magnifier&quot; style=&quot;height: 249px; width: 253px; margin: 20px&quot;&gt;
-  &lt;div class=&quot;maglens&quot; <b>style=&quot;width:100px; height:75px&quot;</b>&gt;
-    &lt;img src=&quot;treasure-map.jpg&quot; class=&quot;maglarge&quot; alt=&quot;treasure map&quot; ismap=&quot;ismap&quot; usemap=&quot;#pirate&quot;
-      style=&quot;height: 374px; width: 380px;&quot; /&gt;
-  &lt;/div&gt;
-&lt;/div&gt;</pre></blockquote>
-
-<p>If the source image in the first example was 560 x 964, then only the magnifier width would be required:</p>
-
-<blockquote><pre>&lt;div class=&quot;magnifier&quot; style=&quot;width: 512px; margin: 20px;&quot;&gt;
-  &lt;div class=&quot;maglens&quot;&gt;
-   &lt;img src=&quot;vlag.jpg&quot; class=&quot;maglarge&quot; alt=&quot;example image&quot; ismap=&quot;ismap&quot; usemap=&quot;#kaart&quot;/&gt;
-  &lt;/div&gt;
-&lt;/div&gt;</pre>
-</blockquote>
-
-<p>You can magnify as many images as you want, as long 
-as they are in different magnifier <code>div</code>s.</p>
-
-<blockquote>If you don't have access to the <code>head</code> section of your
-HTML, you can't load the CSS file. In that case,
-<a href="#classless">use this approach to making magnifiers</a>.
-</blockquote>
-
-<p>Problems? Check <a href="#debugging">these debugging tips</a>.</p>
-
-<h2>Options</h2>
-
-<h3>Autowrap</h3>
-
-<p>You can just mark an image to magnify.</p>
-
-<div style="border: 2px solid grey; padding: 2px; width: 500px">
-  <img src="vlag.jpg" class="maglarge" alt="wrappable image" ismap="ismap" usemap="#kaart" />
-</div>
-
-<h3>Custom Small Image</h3>
-
-<div style="float:left; width: 60%">
-<p>By default, the Javascript creates the reduced image to display.
-If you want to use a customized small image instead,
-put the <code>img</code> element for it
-in the <code>div</code>, with the class <code>magsmall</code>,
-<em>ahead of</em> the <code>maglens DIV</code>, like this. The size
-of the small image will be adjusted to that of the 
-<code>div</code>.</p>
-
-<blockquote><pre>&lt;div class=&quot;magnifier&quot; style=&quot;width: <em>sw</em>px; height: <em>sh</em>px;&quot;&gt;
-  &lt;img src=&quot;<em>image-file</em>&quot; <b>class=&quot;magsmall&quot;</b> /&gt;
-    
-  &lt;div class=&quot;maglens&quot;&gt;
-    &lt;img src=&quot;<em>image-file</em>&quot; class=&quot;maglarge&quot;
-         style=&quot;width: <em>lw</em>px; height: <em>lh</em>px;&quot; /&gt;
-  &lt;/div&gt;
-&lt;/div&gt;</pre></blockquote>
-
-
-<p>Note: You can 
-use two images of the same size to do "reveal" rather than magnification. For example,
-here's a "magnifier" that shows what a galaxy looks like in the X-ray spectrum. 
-These images are from
-<a href="https://chandra.harvard.edu/photo/2002/0157/more.html">the Chandra X-ray Observatory</a>.</p>
-</div>
-
-<div class="magnifier" style="width: 288px; height: 269px">
-  <img class="magsmall" src="0157_optical.jpg" alt="optical view" />
-  <div class="maglens" style="width:75px; height:75px">
-    <img class="maglarge" src="0157_xray.jpg" alt="x-ray view"
-     style="width: 288px; height: 269px" />
+<div class="magnifier" style="width:447px;margin-left:0.5em;border:2px solid gray;padding:5px;float:right">
+  <div class="maglens">
+   <img src="deloitte-agile-map-large.jpg" class="maglarge" alt="deloitte agile map">
   </div>
 </div>
 
-<p style="clear: both">Here's the HTML for the Chandra example:</p>
+<p>
+  This is what JavaScript wraps around your image automatically, if
+  it's not given explicitly.
+</p>
+<p>
+  <em>lw</em> and <em>lh</em> on the image with
+  the <strong>class</strong> <code>maglarge</code>
+  are the width and height of the image that will
+  be shown in the magnifier lens.
+  If omitted, the width and height of the source image is used.
+</p>
 
+<p>
+  <em>sw</em> and <em>sh</em> on the outer <code>DIV</code> 
+  with the <strong>class</strong> <code>magnifier</code>
+  give the width and height of the smaller image that
+  appears on the page. If only a width or height are given,
+  a proportional value for the other
+  will be calculated.
+</p>
+
+<p>
+  Here's an image with a magnifier inside a bordered box, aligned
+  to the right side of the page. The HTML is:
+</p>
+
+<pre>&lt;div class="magnifier" 
+  style="width:447px;margin-left:0.5em;border:2px solid gray;padding:5px;float:right">
+  &lt;div class="maglens">
+   &lt;img src="deloitte-agile-map-large.jpg" class="maglarge" alt="deloitte agile map">
+  &lt;/div>
+&lt;/div></pre>
+
+<br style="clear:both">
+
+<h3>Custom Image Pairs</h3>
+
+<p>
+  With the general HTML pattern, you can specify an image to display
+  instead of a reduced version of the <code>maglarge</code> image.
+  This can be used for an X-ray or augmented reality effect.
+  Here's an example, using
+  images are from
+  <a href="https://chandra.harvard.edu/photo/2002/0157/more.html" target="_blank">
+  the Chandra X-ray Observatory</a>, 
+  showing what a galaxy looks like in the X-ray spectrum. 
+</p>
+
+<div style="float:left;margin-right:2em;">
+  <div class="magnifier" style="width: 288px; height: 269px;">
+    <img class="magsmall" src="0157_optical.jpg" alt="optical view" />
+    <div class="maglens" style="width:100px; height:75px">
+      <img class="maglarge" src="0157_xray.jpg" alt="x-ray view"
+        style="width: 288px; height: 269px" />
+    </div>
+  </div>
+</div>
+
+<p>Here's the HTML:</p>
+    
 <blockquote><pre>
 &lt;div class=&quot;magnifier&quot; style=&quot;width: 288px; height: 269px&quot;&gt;
   &lt;img class=&quot;magsmall&quot; src=&quot;0157_optical.jpg&quot; alt=&quot;optical view&quot; /&gt;
-  &lt;div class=&quot;maglens&quot; style=&quot;width:75px; height:75px&quot;&gt;
+  &lt;div class=&quot;maglens&quot; style=&quot;width:100px; height:75px&quot;&gt;
     &lt;img class=&quot;maglarge&quot; src=&quot;0157_xray.jpg&quot; alt=&quot;x-ray view&quot;
-     style=&quot;width: 288px; height: 269px&quot; /&gt;
+      style=&quot;width: 288px; height: 269px&quot; /&gt;
   &lt;/div&gt;
 &lt;/div&gt;</pre></blockquote>
 
-<a name="magsize"></a>
-<h3>Changing Default Magnifier Size</h3>
+<br style="clear:both">
+  
+<h3>Custom lens size</h3>
 
-<p>To change the default size of the magnifying glass,
-modify the width and height defined for <code>maglens</code>
-in <code>magnifier.css</code>:</p>
+<p id="lenssize">
+  With the general HTML pattern, you can specify a custom width and height for the magnifer lens.
+  The Chandra galaxy example above uses a lens that is 100 x 75 pixels.
+</p>
+
+<p>If you want to change the default lens size, edit this code in <strong>magnifier.css</strong>:
+</p>
 
 <blockquote><pre>.maglens {
   position: absolute;
   overflow: hidden;
-  <b>width: 150px;
-  height: 150px;</b>
+  width: 150px;
+  height: 150px;
 }</pre></blockquote>
-
-
-<h3>Image Maps</h3>
-
-<p>If you want clickable regions in the image, use an HTML image map.
-Put the
-<code>ismap</code> and <code>usemap</code> attributes on the large image. 
-Both examples at the top of this page are image maps.</p>
-
-<h3><a name="classless">Working without Classes</a></h3>
-
-<p>If you can't use the CSS classes, you can define magnifiers
-by explicitly putting the necessary CSS styles on the <code>div</code>
-elements, as follows:
-</p>
-
-<ul>
-<li>The images must have the inline style <code>position: absolute</code>.
-You probably should also give the small image <code>border-style: none</code>.
-</li>
-
-<li>The <code>maglens div</code> must have the inline style
-<code>position: absolute; overflow: hidden;</code> and an explicit width
-and height in pixels.</li>
-
-<li>The <code>magnifier div</code> must have the inline style
-<code>position: relative; overflow: hidden;</code> and, as before, an explicit width
-and height in pixels.
-</li>
-
-<li>Optionally, use ids starting with <code>large</code>,
-<code>small</code> and <code>lens</code>, instead of the classes <code>maglarge</code>,
-<code>magsmall</code> and <code>maglens</code>. Be sure to use distinct id's,
-as required by the W3C standards.</li>
-
-</ul>
-
-<p>Here's the HTML for the previous two examples:</p>
-
-<blockquote><pre>&lt;div style=&quot;position:relative; overflow: hidden; height: 249px; width: 253px; margin: 20px&quot;&gt;
-  &lt;div id=&quot;lens1&quot; style=&quot;position:absolute; overflow: hidden; width: 100px; height: 75px&quot;&gt;
-    &lt;img src=&quot;treasure-map.jpg&quot; id=&quot;large1&quot; alt=&quot;treasure map&quot; ismap=&quot;ismap&quot; usemap=&quot;#pirate&quot;
-         style=&quot;position:absolute; border-style:none; height: 374px; width: 380px&quot; /&gt;
-  &lt;/div&gt;
-&lt;/div&gt;
-
-&lt;div style=&quot;position: relative; width: 288px; height: 269px&quot;&gt;
-  &lt;img id=&quot;small2&quot; src=&quot;0157_optical.jpg&quot; alt=&quot;optical view&quot;
-       style=&quot;position:absolute&quot; /&gt;
-  &lt;div id=&quot;lens2&quot; style=&quot;position:absolute; overflow: hidden; width: 75px; height: 75px&quot;&gt;
-    &lt;img id=&quot;large2&quot; src=&quot;0157_xray.jpg&quot; alt=&quot;x-ray view&quot;
-         style=&quot;position:absolute; width: 288px; height: 269px&quot; /&gt;
-  &lt;/div&gt;
-&lt;/div&gt;</pre></blockquote>
-
-
-<table summary="inlinw magnifier examples" style="width:95%">
-<tr>
-<td style="width:30%"><div style="position:relative; overflow: hidden; height: 249px; width: 253px; margin: 20px">
-  <div id="lens1" style="position:absolute; overflow: hidden; width: 100px; height: 75px">
-    <img src="treasure-map.jpg" id="large1" alt="treasure map" ismap="ismap" usemap="#pirate"
-         style="position:absolute; border-style:none; height: 374px; width: 380px" />
-  </div>
-</div></td>
-<td style="width:30%"><div style="position: relative; width: 288px; height: 269px">
-  <img id="small2" src="0157_optical.jpg" alt="optical view"
-       style="position:absolute" />
-  <div id="lens2" style="position:absolute; overflow: hidden; width: 75px; height: 75px">
-    <img id="large2" src="0157_xray.jpg" alt="x-ray view"
-         style="position:absolute; width: 288px; height: 269px" />
-  </div>
-</div></td>
-</tr>
-</table>
 
 <h3>Overlapping Images</h3>
 
 <p>
   If images overlap, perhaps because of a reduced window size, the "top" image will
-  get the magnifier lens. [Source example from Marshall Abrams.]
+  get the magnifier lens. [Source example from 
+  <a href="https://lirr.potomac-nmra.org/Main/LIRRHome.php" target="_blank">Marshall Abrams</a>.]
 </p>
 
-<div style="float:left; width:50%">
-  <h3>Car Float Yard</h3>
+<div style="float:left; margin:5px; width:45%">
+  <h4>Car Float Yard</h4>
   <div class="magnifier" style="height: 297px; width: 512px">
     <div class="maglens"> 
       <img src="carfloat-lg.JPG" class="maglarge" alt="Car Float"
@@ -309,8 +211,8 @@ as required by the W3C standards.</li>
   </p>
 </div>
 
-<div style="float:left; width:50%">
-  <h3>New York City</h3>
+<div style="float:left; margin:5px; width:50%">
+  <h4>New York City</h4>
   <div class="magnifier" style="height: 297px; width: 475px">
     <div class="maglens"> 
       <img src="PennSta-lg.jpeg" class="maglarge" alt="Pennsylvania Station" 
@@ -331,110 +233,59 @@ as required by the W3C standards.</li>
 
 <br style="clear:both">
 
-<h3><a name="clip"></a>Clipping Rectangles</h3>
-
-<p>For backward compatibility with previous versions of this package, you
-can also use
-<a href="https://www.w3.org/TR/REC-CSS2/visufx.html#clipping">clipping rectangles</a>
-to define the magnifier lens instead of the <code>maglens div</code>.
-Because browser support for
-clipping rectangles is poor, this approach is no longer recommended. </p>
-
-<blockquote>Note: Avoid
-commas in the rectangle if you need to 
-<a href="https://reference.sitepoint.com/css/clip">support Internet Explorer</a>.
-</blockquote>
-
-<p>Here's the HTML for the two examples, using clipping rectangles. Note that there
-is no <code>maglens div</code>:</p>
-
-<blockquote><pre>&lt;div style=&quot;position:relative; overflow: hidden; height: 249px; width: 253px; margin: 20px&quot;&gt;
- &lt;img src=&quot;treasure-map.jpg&quot; id=&quot;large3&quot; alt=&quot;treasure map&quot; ismap=&quot;ismap&quot; usemap=&quot;#pirate&quot;
-    style=&quot;position:absolute; border-style:none; height: 374px; width: 380px; <b>clip:rect(0px 100px 75px 0px);</b>&quot; /&gt;
-&lt;/div&gt;
-
-&lt;div style=&quot;position: relative; width: 288px; height: 269px&quot;&gt;
-  &lt;img id=&quot;small4&quot; src=&quot;0157_optical.jpg&quot; alt=&quot;optical view&quot;
-     style=&quot;position:absolute&quot; /&gt;
-  &lt;img id=&quot;large4&quot; src=&quot;0157_xray.jpg&quot; alt=&quot;x-ray view&quot;
-     style=&quot;position:absolute; width: 288px; height: 269px; <b>clip: rect(0px 75px 75px 0px);</b>&quot; /&gt;
-&lt;/div&gt;</pre></blockquote>
-
-
-<table summary="clipping magnifier examples" style="width:95%">
-<tr>
-<td style="width:30%"><div style="position:relative; overflow: hidden; height: 249px; width: 253px; margin: 20px">
- <img src="treasure-map.jpg" id="large3" alt="treasure map" ismap="ismap" usemap="#pirate"
-    style="position:absolute; border-style:none; height: 374px; width: 380px; clip:rect(0px 100px 75px 0px);" />
-</div></td>
-<td style="width:30%"><div style="position: relative; width: 288px; height: 269px">
-  <img id="small4" src="0157_optical.jpg" alt="optical view"
-     style="position:absolute" />
-  <img id="large4" src="0157_xray.jpg" alt="x-ray view"
-     style="position:absolute; width: 288px; height: 269px; clip: rect(0px 75px 75px 0px);" />
-</div></td>
-</tr>
-</table>
-
 <h2><a name="debugging">Troubleshooting</a></h2>
 
-<p>The magnifier tries to catch many common errors with images.
+<p>
 If no magnifier appears when you roll over your images,
-or the magnifier is distorted or off-center, check the following:</p>
+or the magnifier is distorted or off-center, 
+<a href="https://javascript.info/devtools" target="_blank">
+open the browser console window</a>. Reload the page.
+If there are any errors, fix them.
+</p>
 
-<ul>
-<li><b>Test whether <code>magnifier.js</code> was loaded.</b> Type
-<code>javascript:alert(MAGNIFIER)</code> -- exactly like that --
-into the browser address field. An alert box will appear. If
-it contains <code>undefined</code>,
-there was a problem loading the Javascript. Make sure the file has been
-properly uploaded to your server, 
-and that your HTML contains <a href="#loadmag">the correct code for loading
-it</a>.
-</li>
+<p>
+  If there are no errors, but magnifiers are still not working,
+  try entering the following in the browser console.</p>
 
-<li><b>Test whether the code found your images.</b> Type
-<code>javascript:alert(MAGNIFIER.data().length)</code> 
-into the browser address field. An alert box will appear with the number
-of magnifiers the code found. If it's zero, make sure your the images have 
-the correct classes or ids, and the correct HTML structure.
-</li>
+<blockquote><pre>MAGNIFIER</pre></blockquote>
 
-<li><b>Test your HTML and CSS.</b> Use tools to check the general
-validity of your HTML, CSS and links, using either software on your
-machine, or online sites, such as the W3C
-<a href="https://validator.w3.org/">HTML checker</a>,
-<a href="https://jigsaw.w3.org/css-validator/">CSS checker</a>, and 
-<a href="https://validator.w3.org/checklink">link checker</a>.
+<p>
+  If this is undefined,
+  there was a problem loading the Javascript. Make sure the file has been
+  properly uploaded to your server, 
+  and that your HTML contains <a href="#loadmag">the correct code for loading
+  it</a>.
+</p>
 
-<blockquote>You should always strive for zero errors in validation.
-Unfortunately, if you use clipping rectangles, you'll have to put up
-with complaints about missing commas if you want to support Internet
-Explorer.</blockquote>
-</li>  
+<blockquote><pre>MAGNIFIER.data().length</pre></blockquote>
 
-<li><b>Double-check your widths and heights.</b> Make sure
-that the widths and heights are specified correctly on
-the large image and enclosing magnifier <code>div</code>. Don't
-forget the <code>px</code>, with no intervening spaces, e.g.,
-<code>12px</code>, not <code>12 px</code>.</li>
-
-<li><b>Avoid commas in clip rectangles.</b> E.g., write
-<code>clip:rect(0px 50px 75px 0px)</code>, not 
-<code>clip:rect(0px, 50px, 75px, 0px)</code>, because
-Internet Explorer, as of version 7, doesn't allow them.</li>
-</ul>
-
+<p>
+  If this returns zero, it means no images with magnifiers were found. 
+  Perhaps your images were not marked up correctly. 
+  Compare your HTML against the samples above. Validate
+  your HTML, using tools such as the W3C
+  <a href="https://validator.w3.org/" target="_blank">HTML checker</a>.
+  If you have a CSS stylesheet, use
+  <a href="https://jigsaw.w3.org/css-validator/" target="_blank">CSS checker</a>.
+</p>
 
 <h2>How it works</h2>
 
 <p>
-As the mouse or touching finger moves over the small image, the Javascript 
-repositions the lens, i.e., the <code>maglens div</code> or the clipping
-rectangle, to stay centered 
-under the large image so that
-what's the lens shows is the region that corresponds to where the mouse is in the
-small image.</p>
+  The "magnifier lens" is a <code>DIV</code> that contains
+  the image with the class <code>maglarge</code>. The lens is
+  invisible by default, so the only thing you see is the image
+  in the outer <code>DIV</code> with the class <code>magnifier</code>.
+</p>
+
+<p>
+  When the mouse cursor is over a point in a visible image with a magnifier, 
+  JavaScript code centers the lens <code>DIV </code> on that point,
+  centers hidden image to align the corresponding point of the hidden image,
+  and unhides the lens.
+  As the cursor moves, automatic re-centering gives the
+  illusion of magnifying the visible image.
+</p>
 
 <hr />
 
